@@ -35,10 +35,11 @@ import { changeClockEnable } from './sequential';
 import { changeInputSize } from './modules';
 import { verilogModeGet, verilogModeSet } from './Verilog2CV';
 import { updateTestbenchUI } from './testbench';
+import { updateSidebarIcons } from './setup';
 import load from './data/load';
 
 export const circuitProperty = {
-    toggleLayoutMode, setProjectName, changeCircuitName, changeClockTime, deleteCurrentCircuit, changeClockEnable, changeInputSize, changeLightMode,
+    toggleLayoutMode, setProjectName, changeCircuitName, changeClockTime, deleteCurrentCircuit, changeClockEnable, changeInputSize, changeLightMode, changeGateLayout,
 };
 export var scopeList = {};
 export function resetScopeList() {
@@ -54,7 +55,7 @@ export function resetScopeList() {
  */
 export function switchCircuit(id) {
     if (layoutModeGet()) { toggleLayoutMode(); }
-    if (verilogModeGet()) { verilogModeSet(false);}
+    if (verilogModeGet()) { verilogModeSet(false); }
 
     // globalScope.fixLayout();
     scheduleBackup();
@@ -181,18 +182,18 @@ export function newCircuit(name, id, isVerilog = false, isVerilogMain = false) {
         $('.tabsCloseButton').off('click');
 
         // Add listeners
-        $('.circuits').on('click',function () {
+        $('.circuits').on('click', function () {
             switchCircuit(this.id);
         });
 
-        $('.circuitName').on('click',(e) => {
+        $('.circuitName').on('click', (e) => {
             simulationArea.lastSelected = globalScope.root;
             setTimeout(() => {
                 document.getElementById('circname').select();
             }, 100);
         });
 
-        $('.tabsCloseButton').on('click',function (e) {
+        $('.tabsCloseButton').on('click', function (e) {
             e.stopPropagation();
             deleteCurrentCircuit(this.id);
         });
@@ -216,6 +217,20 @@ export function changeCircuitName(name, id = globalScope.id) {
     name = escapeHtml(stripTags(name));
     $(`#${id} .circuitName`).html(`${truncateString(name, 18)}`);
     scopeList[id].name = name;
+}
+
+/**
+ * Used to change gate layout of a circuit
+ * @param {boolean} isDIN - new value
+ * @param {string} id - id of the circuit
+ * @category circuit
+ */
+export function changeGateLayout(isDIN, id = globalScope.id) {
+    scopeList[id].settings.isDIN = isDIN;
+    updateCanvasSet(true);
+    if (id === globalScope.id) {
+        updateSidebarIcons();
+    }
 }
 
 /**
@@ -259,6 +274,10 @@ export default class Scope {
             title_x: 50,
             title_y: 13,
             titleEnabled: true,
+        };
+
+        this.settings = {
+            isDIN: false,
         };
     }
 

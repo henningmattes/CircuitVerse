@@ -8,7 +8,10 @@ import { generateId, showMessage } from './utils';
 import backgroundArea from './backgroundArea';
 import plotArea from './plotArea';
 import simulationArea from './simulationArea';
-import { dots } from './canvasApi';
+import { dots, rect2, fillText } from './canvasApi';
+window.rect2 = rect2;
+window.fillText = fillText;
+
 import { update, updateSimulationSet, updateCanvasSet } from './engine';
 import { setupUI } from './ux';
 import startMainListeners from './listeners';
@@ -110,8 +113,11 @@ function setupElementLists() {
     window.renderOrder = [...(moduleList.slice().reverse()), 'wires', 'allNodes']; // Order of render
 
     function createIcon(element) {
+        const isDIN = (window.globalScope && globalScope.settings) ? globalScope.settings.isDIN : false;
+        const dinGates = ['AndGate', 'OrGate', 'NotGate', 'NandGate', 'NorGate', 'XorGate', 'XnorGate'];
+        const iconName = (isDIN && dinGates.includes(element.name)) ? `${element.name}_DIN` : element.name;
         return `<div class="icon logixModules" id="${element.name}" title="${element.label}">
-            <img src= "/img/${element.name}.svg" alt="element's image" >
+            <img src= "/img/${iconName}.svg" alt="element's image" >
         </div>`;
     }
 
@@ -199,4 +205,20 @@ export function setup() {
     if (!localStorage.tutorials_tour_done && !embed) {
         setTimeout(() => { showTourGuide(); }, 2000);
     }
+}
+
+/**
+ * Function to update sidebar icons based on gate layout
+ * @category setup
+ */
+export function updateSidebarIcons() {
+    const isDIN = globalScope.settings.isDIN;
+    const dinGates = ['AndGate', 'OrGate', 'NotGate', 'NandGate', 'NorGate', 'XorGate', 'XnorGate'];
+    $('.icon.logixModules').each(function () {
+        const name = $(this).attr('id');
+        if (dinGates.includes(name)) {
+            const iconName = isDIN ? `${name}_DIN` : name;
+            $(this).find('img').attr('src', `/img/${iconName}.svg`);
+        }
+    });
 }

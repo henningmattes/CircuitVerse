@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+    <rect x="12" y="5" width="25" height="40" fill="#FFF" stroke="#000" stroke-width="3" fill-opacity=".8"/>
+    <text x="24" y="30" font-family="Arial" font-size="14" text-anchor="middle" fill="#000">≥1</text>
+    <path fill="green" d="M15 15a3 3 0 110-.003zM15 35a3 3 0 110-.003zM45 25a3 3 0 110-.003z"/>
+</svg>

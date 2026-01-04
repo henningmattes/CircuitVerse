@@ -27,6 +27,9 @@ export function backUp(scope = globalScope) {
     // Storing layout
     data.layout = scope.layout;
 
+    // Storing scope settings (e.g., DIN symbols)
+    data.settings = scope.settings;
+
     // Storing Verilog Properties
     data.verilogMetadata = scope.verilogMetadata;
 

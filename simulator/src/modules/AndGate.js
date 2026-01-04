@@ -1,7 +1,7 @@
 import CircuitElement from "../circuitElement";
 import Node, { findNode } from "../node";
 import simulationArea from "../simulationArea";
-import { correctWidth, lineTo, moveTo, arc } from "../canvasApi";
+import { correctWidth, lineTo, moveTo, arc, rect2, fillText } from "../canvasApi";
 import { changeInputSize } from "../modules";
 import { colors } from "../themer/themer";
 import { gateGenerateVerilog } from '../utils';
@@ -103,7 +103,7 @@ export default class AndGate extends CircuitElement {
             result &= this.inp[i].value || 0;
         this.output1.value = result >>> 0;
         simulationArea.simulationQueue.add(this.output1);
-        
+
         this.setOutputsUpstream(true);
     }
 
@@ -112,29 +112,47 @@ export default class AndGate extends CircuitElement {
      * function to draw And Gate
      */
     customDraw() {
-        var ctx = simulationArea.context;
-        ctx.beginPath();
-        ctx.lineWidth = correctWidth(3);
-        ctx.strokeStyle = colors["stroke"]; // ("rgba(0,0,0,1)");
-        ctx.fillStyle = colors["fill"];
+        const ctx = simulationArea.context;
         const xx = this.x;
         const yy = this.y;
 
-        moveTo(ctx, -10, -20, xx, yy, this.direction);
-        lineTo(ctx, 0, -20, xx, yy, this.direction);
-        arc(ctx, 0, 0, 20, -Math.PI / 2, Math.PI / 2, xx, yy, this.direction);
-        lineTo(ctx, -10, 20, xx, yy, this.direction);
-        lineTo(ctx, -10, -20, xx, yy, this.direction);
+        ctx.beginPath();
+        ctx.lineWidth = correctWidth(3);
+        ctx.strokeStyle = colors["stroke"];
+        ctx.fillStyle = colors["fill"];
+
+        if (globalScope.settings.isDIN) {
+            // DIN/IEC Style: Rectangular
+            rect2(ctx, -10, -20, 30, 40, xx, yy, this.direction);
+        } else {
+            // ANSI Style: Curved
+            moveTo(ctx, -10, -20, xx, yy, this.direction);
+            lineTo(ctx, 0, -20, xx, yy, this.direction);
+            arc(ctx, 0, 0, 20, -Math.PI / 2, Math.PI / 2, xx, yy, this.direction);
+            lineTo(ctx, -10, 20, xx, yy, this.direction);
+            lineTo(ctx, -10, -20, xx, yy, this.direction);
+        }
         ctx.closePath();
 
         if (
             (this.hover && !simulationArea.shiftDown) ||
             simulationArea.lastSelected === this ||
             simulationArea.multipleObjectSelections.contains(this)
-        )
+        ) {
             ctx.fillStyle = colors["hover_select"];
+        }
+
         ctx.fill();
         ctx.stroke();
+
+        if (globalScope.settings.isDIN) {
+            // Draw Symbol &
+            ctx.beginPath();
+            ctx.textAlign = "center";
+            ctx.fillStyle = colors["text"];
+            fillText2(ctx, "&", 5, 0, xx, yy, this.direction);
+            ctx.fill();
+        }
     }
 
     generateVerilog() {

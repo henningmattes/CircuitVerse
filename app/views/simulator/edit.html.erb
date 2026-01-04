@@ -51,6 +51,7 @@
           <li><a class="dropdown-item text-start ps-1 logixButton" id="createSaveAsImgPrompt">Download Image</a>
           <li><a class="dropdown-item text-start ps-1 logixButton" id="colorThemes">Themes</a>
           <li><a class="dropdown-item text-start ps-1" id="customShortcut">Custom Shortcut</a></li>
+          <li><a class="dropdown-item text-start ps-1 logixButton" id="gateLayout">Gate Layout</a></li>
           <li><a class="dropdown-item text-start ps-1 logixButton" id="generateVerilog">Export Verilog</a>
         </ul>
       </li>
@@ -609,6 +610,12 @@
         checked="checked">1x<span></span></label>
     <label class="option custom-radio inline"><input type="radio" name="resolution" value="2">2x<span></span></label>
     <label class="option custom-radio inline"><input type="radio" name="resolution" value="4">4x<span></span></label>
+  </div>
+</div>
+<div id="gateLayoutDialog" style="display:none;" title="Select Gate Layout">
+  <div class="download-dialog-section-1">
+      <label class="option custom-radio inline"><input type="radio" name="gateLayoutType" value="ANSI" checked="checked">ANSI<span></span></label>
+      <label class="option custom-radio inline"><input type="radio" name="gateLayoutType" value="DIN">DIN<span></span></label>
   </div>
 </div>
 <div id="colorThemesDialog" class='customScroll colorThemesDialog' tabindex="0" style="display: none;" title="Select Theme"></div>

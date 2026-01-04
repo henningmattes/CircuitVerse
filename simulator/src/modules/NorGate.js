@@ -9,6 +9,9 @@ import {
     moveTo,
     arc2,
     drawCircle2,
+    rect2,
+    fillText,
+    fillText2,
 } from "../canvasApi";
 import { changeInputSize } from "../modules";
 /**
@@ -23,6 +26,7 @@ import { changeInputSize } from "../modules";
  * @param {number=} bitWidth - bit width per node.
  * @category modules
  */
+// DIN update 2
 import { colors } from "../themer/themer";
 
 export default class NorGate extends CircuitElement {
@@ -110,41 +114,63 @@ export default class NorGate extends CircuitElement {
      */
     customDraw() {
         var ctx = simulationArea.context;
-        ctx.strokeStyle = colors["stroke"];
-        ctx.lineWidth = correctWidth(3);
-
         const xx = this.x;
         const yy = this.y;
+
         ctx.beginPath();
+        ctx.lineWidth = correctWidth(3);
+        ctx.strokeStyle = colors["stroke"];
         ctx.fillStyle = colors["fill"];
 
-        moveTo(ctx, -10, -20, xx, yy, this.direction, true);
-        bezierCurveTo(0, -20, +15, -10, 20, 0, xx, yy, this.direction);
-        bezierCurveTo(
-            0 + 15,
-            0 + 10,
-            0,
-            0 + 20,
-            -10,
-            +20,
-            xx,
-            yy,
-            this.direction
-        );
-        bezierCurveTo(0, 0, 0, 0, -10, -20, xx, yy, this.direction);
+        if (globalScope.settings.isDIN) {
+            // DIN/IEC Style: Rectangular
+            rect2(ctx, -10, -20, 30, 40, xx, yy, this.direction);
+        } else {
+            // ANSI Style: Curved
+            moveTo(ctx, -10, -20, xx, yy, this.direction, true);
+            bezierCurveTo(0, -20, +15, -10, 20, 0, xx, yy, this.direction);
+            bezierCurveTo(
+                0 + 15,
+                0 + 10,
+                0,
+                0 + 20,
+                -10,
+                +20,
+                xx,
+                yy,
+                this.direction
+            );
+            bezierCurveTo(0, 0, 0, 0, -10, -20, xx, yy, this.direction);
+        }
         ctx.closePath();
+
         if (
             (this.hover && !simulationArea.shiftDown) ||
             simulationArea.lastSelected === this ||
             simulationArea.multipleObjectSelections.contains(this)
-        )
+        ) {
             ctx.fillStyle = colors["hover_select"];
+        }
+
         ctx.fill();
         ctx.stroke();
+
         ctx.beginPath();
-        drawCircle2(ctx, 25, 0, 5, xx, yy, this.direction);
-        ctx.stroke();
-        // for debugging
+        if (globalScope.settings.isDIN) {
+            // DIN symbol ≥1 and negation circle at edge
+            drawCircle2(ctx, 25, 0, 5, xx, yy, this.direction);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.textAlign = "center";
+            ctx.fillStyle = colors["text"];
+            fillText2(ctx, "≥1", 2, 0, xx, yy, this.direction);
+            ctx.fill();
+        } else {
+            // ANSI Negation circle
+            drawCircle2(ctx, 25, 0, 5, xx, yy, this.direction);
+            ctx.stroke();
+        }
     }
 
     generateVerilog() {

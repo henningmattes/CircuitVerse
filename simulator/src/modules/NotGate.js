@@ -1,7 +1,7 @@
 import CircuitElement from "../circuitElement";
 import Node, { findNode } from "../node";
 import simulationArea from "../simulationArea";
-import { correctWidth, lineTo, moveTo, drawCircle2 } from "../canvasApi";
+import { correctWidth, lineTo, moveTo, drawCircle2, rect2, fillText, fillText2 } from "../canvasApi";
 import { changeInputSize } from "../modules";
 /**
  * @class
@@ -66,29 +66,54 @@ export default class NotGate extends CircuitElement {
      * function to draw element
      */
     customDraw() {
-        var ctx = simulationArea.context;
-        ctx.strokeStyle = colors["stroke"];
-        ctx.lineWidth = correctWidth(3);
-
+        const ctx = simulationArea.context;
         const xx = this.x;
         const yy = this.y;
+
         ctx.beginPath();
+        ctx.lineWidth = correctWidth(3);
+        ctx.strokeStyle = colors["stroke"];
         ctx.fillStyle = colors["fill"];
-        moveTo(ctx, -10, -10, xx, yy, this.direction);
-        lineTo(ctx, 10, 0, xx, yy, this.direction);
-        lineTo(ctx, -10, 10, xx, yy, this.direction);
+
+        if (globalScope.settings.isDIN) {
+            // DIN/IEC Style: Rectangular
+            rect2(ctx, -10, -10, 20, 20, xx, yy, this.direction);
+        } else {
+            // ANSI Style: Triangle
+            moveTo(ctx, -10, -10, xx, yy, this.direction);
+            lineTo(ctx, 10, 0, xx, yy, this.direction);
+            lineTo(ctx, -10, 10, xx, yy, this.direction);
+        }
         ctx.closePath();
+
         if (
             (this.hover && !simulationArea.shiftDown) ||
             simulationArea.lastSelected === this ||
             simulationArea.multipleObjectSelections.contains(this)
-        )
+        ) {
             ctx.fillStyle = colors["hover_select"];
+        }
+
         ctx.fill();
         ctx.stroke();
+
         ctx.beginPath();
-        drawCircle2(ctx, 15, 0, 5, xx, yy, this.direction);
-        ctx.stroke();
+        if (globalScope.settings.isDIN) {
+            // DIN Negation circle at edge
+            drawCircle2(ctx, 10, 0, 5, xx, yy, this.direction);
+            ctx.stroke();
+
+            // Draw Symbol 1
+            ctx.beginPath();
+            ctx.textAlign = "center";
+            ctx.fillStyle = colors["text"];
+            fillText2(ctx, "1", 0, 0, xx, yy, this.direction);
+            ctx.fill();
+        } else {
+            // ANSI Negation circle
+            drawCircle2(ctx, 15, 0, 5, xx, yy, this.direction);
+            ctx.stroke();
+        }
     }
 
     generateVerilog() {

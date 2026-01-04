@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 
-import { fullView, deleteSelected } from './ux';
+import { fullView, deleteSelected, createGateLayoutPrompt } from './ux';
 import { createSubCircuitPrompt } from './subcircuit';
 import save from './data/save';
 import load from './data/load';
@@ -51,4 +51,5 @@ logixFunction.bitconverter = bitConverterDialog;
 logixFunction.createNewCircuitScope = createNewCircuitScope;
 logixFunction.ExportCircuitFiles = ExportCircuitFiles;
 logixFunction.ImportCircuitFiles = ImportCircuitFiles;
+logixFunction.gateLayout = createGateLayoutPrompt;
 export default logixFunction;
